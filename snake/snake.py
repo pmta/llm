@@ -1,5 +1,7 @@
 import pygame
 import random
+import time
+
 
 class SnakeGame:
     def __init__(self):
@@ -84,73 +86,85 @@ class SnakeGame:
                     quit()
 
 
-
     def game_loop(self):
+        # Initialize the countdown timer
+        countdown_start_time = time.time()
+        countdown_duration = 5  # 5 seconds countdown
+
         # Main game loop
         while True:
             if self.game_active:
-                # Event handling
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        pygame.quit()
-                        quit()
-                    elif event.type == pygame.KEYDOWN:
-                        if event.key == pygame.K_UP and self.snake_direction != "down":
-                            self.snake_direction = "up"
-                        elif event.key == pygame.K_DOWN and self.snake_direction != "up":
-                            self.snake_direction = "down"
-                        elif event.key == pygame.K_LEFT and self.snake_direction != "right":
-                            self.snake_direction = "left"
-                        elif event.key == pygame.K_RIGHT and self.snake_direction != "left":
-                            self.snake_direction = "right"
+                # Calculate the remaining countdown time
+                remaining_time = countdown_duration - (time.time() - countdown_start_time)
+                if remaining_time > 0:
+                    # Display the countdown text
+                    countdown_text = self.font.render(f"Starting in {int(remaining_time)} seconds", True, (255, 255, 255))
+                    self.game_window.blit(countdown_text, (self.window_width // 2 - countdown_text.get_width() // 2,
+                                                            self.window_height // 2 - countdown_text.get_height() // 2))
+                else:
+                    # Event handling
+                    for event in pygame.event.get():
+                        if event.type == pygame.QUIT:
+                            pygame.quit()
+                            quit()
+                        elif event.type == pygame.KEYDOWN:
+                            if event.key == pygame.K_UP and self.snake_direction != "down":
+                                self.snake_direction = "up"
+                            elif event.key == pygame.K_DOWN and self.snake_direction != "up":
+                                self.snake_direction = "down"
+                            elif event.key == pygame.K_LEFT and self.snake_direction != "right":
+                                self.snake_direction = "left"
+                            elif event.key == pygame.K_RIGHT and self.snake_direction != "left":
+                                self.snake_direction = "right"
 
-                # Update snake position
-                snake_head = self.snake[0]
-                if self.snake_direction == "up":
-                    new_head = (snake_head[0], snake_head[1] - 1)
-                elif self.snake_direction == "down":
-                    new_head = (snake_head[0], snake_head[1] + 1)
-                elif self.snake_direction == "left":
-                    new_head = (snake_head[0] - 1, snake_head[1])
-                elif self.snake_direction == "right":
-                    new_head = (snake_head[0] + 1, snake_head[1])
+                    # Update snake position
+                    snake_head = self.snake[0]
+                    if self.snake_direction == "up":
+                        new_head = (snake_head[0], snake_head[1] - 1)
+                    elif self.snake_direction == "down":
+                        new_head = (snake_head[0], snake_head[1] + 1)
+                    elif self.snake_direction == "left":
+                        new_head = (snake_head[0] - 1, snake_head[1])
+                    elif self.snake_direction == "right":
+                        new_head = (snake_head[0] + 1, snake_head[1])
 
-                self.snake.insert(0, new_head)
+                    self.snake.insert(0, new_head)
 
-                # Check if snake hits apple
-                if self.snake[0] == self.apple_pos:
-                    # Increase snake length and score
-                    self.snake_length += 1
-                    self.score += 100
-                    # Generate new apple position
-                    self.apple_pos = (random.randint(0, self.grid_width - 1), random.randint(0, self.grid_height - 1))
+                    # Check if snake hits apple
+                    if self.snake[0] == self.apple_pos:
+                        # Increase snake length and score
+                        self.snake_length += 1
+                        self.score += 100
+                        # Generate new apple position
+                        self.apple_pos = (random.randint(0, self.grid_width - 1), random.randint(0, self.grid_height - 1))
 
-                # Check if snake hits wall or itself
-                if (self.snake[0][0] < 0 or self.snake[0][0] >= self.grid_width or
-                        self.snake[0][1] < 0 or self.snake[0][1] >= self.grid_height or
-                        self.snake[0] in self.snake[1:]):
-                    self.game_active = False
+                    # Check if snake hits wall or itself
+                    if (self.snake[0][0] < 0 or self.snake[0][0] >= self.grid_width or
+                            self.snake[0][1] < 0 or self.snake[0][1] >= self.grid_height or
+                            self.snake[0] in self.snake[1:]):
+                        self.game_active = False
 
-                # Update snake length
-                if len(self.snake) > self.snake_length:
-                    self.snake.pop()
+                    # Update snake length
+                    if len(self.snake) > self.snake_length:
+                        self.snake.pop()
 
-                # Render the game window
-                self.game_window.fill((0, 0, 0))
+                    # Render the game window
+                    self.game_window.fill((0, 0, 0))
 
-                # Draw the snake
-                for pos in self.snake:
-                    pygame.draw.rect(self.game_window, (0, 255, 0),
-                                     (pos[0] * self.cell_size, pos[1] * self.cell_size, self.cell_size, self.cell_size))
+                    # Draw the snake
+                    for pos in self.snake:
+                        pygame.draw.rect(self.game_window, (0, 255, 0),
+                                         (pos[0] * self.cell_size, pos[1] * self.cell_size, self.cell_size,
+                                          self.cell_size))
 
-                # Draw the apple
-                pygame.draw.rect(self.game_window, (255, 0, 0),
-                                 (self.apple_pos[0] * self.cell_size, self.apple_pos[1] * self.cell_size,
-                                  self.cell_size, self.cell_size))
+                    # Draw the apple
+                    pygame.draw.rect(self.game_window, (255, 0, 0),
+                                     (self.apple_pos[0] * self.cell_size, self.apple_pos[1] * self.cell_size,
+                                      self.cell_size, self.cell_size))
 
-                # Draw the score
-                score_text = self.font.render(f"Score: {self.score}", True, (255, 255, 255))
-                self.game_window.blit(score_text, (10, 10))
+                    # Draw the score
+                    score_text = self.font.render(f"Score: {self.score}", True, (255, 255, 255))
+                    self.game_window.blit(score_text, (10, 10))
             else:
                 self.show_end_screen()
 
@@ -159,6 +173,8 @@ class SnakeGame:
 
             # Set the game FPS
             self.clock.tick(10)
+
+
 
 # Call the game loop function from __main__
 if __name__ == "__main__":
