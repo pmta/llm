@@ -53,14 +53,15 @@ class SnakeGame:
 
     def show_end_screen(self):
         # Display the game over text
-        game_over_text = self.font.render("Game Over", True, (255, 255, 255))
+        game_over_text = self.font.render("Game Over", True, (0, 128, 0))
+        game_over_text = pygame.font.Font(None, 36).render("Game Over", True, (0, 128, 0))
         self.game_window.blit(game_over_text, (self.window_width // 2 - game_over_text.get_width() // 2,
                                                 self.window_height // 2 - game_over_text.get_height() // 2))
 
         # Create the new game button
         new_game_button = pygame.Rect(self.window_width // 2 - 100, self.window_height // 2 + 50, 100, 50)
         pygame.draw.rect(self.game_window, self.button_color, new_game_button)
-        new_game_text = self.font.render("New Game", True, (255, 255, 255))
+        new_game_text = pygame.font.Font(None, 24).render("New Game", True, (0, 128, 0))
         new_game_text_rect = new_game_text.get_rect()
         new_game_text_rect.center = new_game_button.center
         self.game_window.blit(new_game_text, new_game_text_rect)
@@ -68,7 +69,7 @@ class SnakeGame:
         # Create the quit button
         quit_button = pygame.Rect(self.window_width // 2 + 50, self.window_height // 2 + 50, 100, 50)
         pygame.draw.rect(self.game_window, self.button_color, quit_button)
-        quit_text = self.font.render("Quit", True, (255, 255, 255))
+        quit_text = pygame.font.Font(None, 24).render("Quit", True, (0, 128, 0))
         quit_text_rect = quit_text.get_rect()
         quit_text_rect.center = quit_button.center
         self.game_window.blit(quit_text, quit_text_rect)
@@ -98,7 +99,8 @@ class SnakeGame:
                 remaining_time = countdown_duration - (time.time() - countdown_start_time)
                 if remaining_time > 0:
                     # Display the countdown text
-                    countdown_text = self.font.render(f"Starting in {int(remaining_time)} seconds", True, (255, 255, 255))
+                    countdown_text = pygame.font.Font(None, 24).render(f"Starting in {int(remaining_time)} seconds", True,
+                                                                      (0, 128, 0))
                     self.game_window.blit(countdown_text, (self.window_width // 2 - countdown_text.get_width() // 2,
                                                             self.window_height // 2 - countdown_text.get_height() // 2))
                 else:
@@ -136,7 +138,12 @@ class SnakeGame:
                         self.snake_length += 1
                         self.score += 100
                         # Generate new apple position
-                        self.apple_pos = (random.randint(0, self.grid_width - 1), random.randint(0, self.grid_height - 1))
+                        #self.apple_pos = (random.randint(0, self.grid_width - 1), random.randint(0, self.grid_height - 1))
+                        while True:
+                            new_apple_pos = (random.randint(0, self.grid_width - 1), random.randint(0, self.grid_height - 1))
+                            if new_apple_pos not in self.snake:
+                                self.apple_pos = new_apple_pos
+                                break
 
                     # Check if snake hits wall or itself
                     if (self.snake[0][0] < 0 or self.snake[0][0] >= self.grid_width or
@@ -163,7 +170,7 @@ class SnakeGame:
                                       self.cell_size, self.cell_size))
 
                     # Draw the score
-                    score_text = self.font.render(f"Score: {self.score}", True, (255, 255, 255))
+                    score_text = pygame.font.Font(None, 24).render(f"Score: {self.score}", True, (0, 128, 0))
                     self.game_window.blit(score_text, (10, 10))
             else:
                 self.show_end_screen()
